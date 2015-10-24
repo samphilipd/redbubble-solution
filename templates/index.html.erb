@@ -1,0 +1,14 @@
+<h1><%= @title %></h1>
+
+<ul>
+  <% @makes.each do |m| %>
+    <li><a href="/<%= m[:filename] %>"><%= m[:make] %></a></li>
+  <% end %>
+</ul>
+
+<ul>
+  <% @thumbnail_urls.each do |turl| %>
+    <li><img src="<%= turl %>" /></li>
+  <% end %>
+</ul>
+
