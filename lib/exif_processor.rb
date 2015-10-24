@@ -13,23 +13,23 @@ class ExifProcessor
   # out_dir
   # ├── Canon
   # │   ├── Canon_EOS_20D.html
-  # │   └── Canon_EOS_400D_DIGITAL.html
-  # ├── Canon.html
+  # │   ├── Canon_EOS_400D_DIGITAL.html
+  # │   └── index.html
   # ├── FUJIFILM
-  # │   └── FinePix_S6500fd.html
-  # ├── FUJIFILM.html
+  # │   ├── FinePix_S6500fd.html
+  # │   └── index.html
   # ├── FUJI_PHOTO_FILM_CO.__LTD.
-  # │   └── SLP1000SE.html
-  # ├── FUJI_PHOTO_FILM_CO.__LTD..html
+  # │   ├── SLP1000SE.html
+  # │   └── index.html
   # ├── LEICA
-  # │   └── D-LUX_3.html
-  # ├── LEICA.html
+  # │   ├── D-LUX_3.html
+  # │   └── index.html
   # ├── NIKON_CORPORATION
-  # │   └── NIKON_D80.html
-  # ├── NIKON_CORPORATION.html
+  # │   ├── NIKON_D80.html
+  # │   └── index.html
   # ├── Panasonic
-  # │   └── DMC-FZ30.html
-  # ├── Panasonic.html
+  # │   ├── DMC-FZ30.html
+  # │   └── index.html
   # └── index.html
   def process
     cameras = parse(@xml)
@@ -77,8 +77,11 @@ class ExifProcessor
 
     @models = extract_models(cameras)
 
-    @make_dir = sanitize_filename(make)
-    make_page =  @out_dir + '/' + @make_dir + '.html'
+    # Create the make subdirectory if it doesn't exist already
+    make_dir = "#{@out_dir}/#{sanitize_filename(make)}"
+    Dir.mkdir(make_dir) unless File.exist?(make_dir)
+
+    make_page =  make_dir + '/index.html'
     File.open(make_page, 'w') do |f|
       template = File.open("templates/make.html.erb").read
       erb = ERB.new(template, 0, '>')
@@ -91,13 +94,11 @@ class ExifProcessor
   # Creates the model pages under a subdirectory titled by make
   def write_model(make, model, cameras)
     @title = make + ' - ' + model
+    @make = make
 
     @thumbnail_urls = cameras.map do |camera|
       camera[:image_url]
     end
-
-    @make = make
-    @make_location = '../' + sanitize_filename(make) + '.html'
 
     # Create the make subdirectory if it doesn't exist already
     make_dir = "#{@out_dir}/#{sanitize_filename(make)}"
@@ -136,7 +137,7 @@ class ExifProcessor
     cameras.map {|c| c[:make]}.uniq.map do |make|
       {
         make: make,
-        filename: sanitize_filename(make + '.html')
+        filename: sanitize_filename(make)
       }
     end
   end

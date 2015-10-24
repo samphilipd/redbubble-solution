@@ -2,7 +2,7 @@
 
 <ul>
   <% @models.each do |m| %>
-    <li><a href="<%= @make_dir + '/' + m[:filename] %>"><%= m[:model] %></a></li>
+    <li><a href="<%= m[:filename] %>"><%= m[:model] %></a></li>
   <% end %>
 </ul>
 
@@ -12,4 +12,4 @@
   <% end %>
 </ul>
 
-<a href="index.html">Back to index</a>
+<a href="../index.html">Back to all camera makes</a>
