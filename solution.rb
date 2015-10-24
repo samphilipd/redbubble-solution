@@ -1,5 +1,3 @@
-require 'nokogiri'
-require 'erb'
 require_relative './lib/exif_processor.rb'
 
 if __FILE__ == $0

@@ -1,3 +1,5 @@
+require 'erb'
+require 'nokogiri'
 # A batch processor that takes an input file and produces one HTML file for each
 # camera make, one for each camera model and also an index.
 class ExifProcessor
