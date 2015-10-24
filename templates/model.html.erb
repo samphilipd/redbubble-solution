@@ -1,0 +1,10 @@
+<h1><%= @title %></h1>
+
+<ul>
+  <% @thumbnail_urls.each do |turl| %>
+    <li><img src="<%= turl %>" /></li>
+  <% end %>
+</ul>
+
+<a href="<%= @make_location %>">Back to all models for <%= @make %></a><br />
+<a href="../index.html">Back to index</a>

@@ -2,7 +2,7 @@
 
 <ul>
   <% @models.each do |m| %>
-    <li><a href="<%= m[:filename] %>"><%= m[:model] %></a></li>
+    <li><a href="<%= @make_dir + '/' + m[:filename] %>"><%= m[:model] %></a></li>
   <% end %>
 </ul>
 

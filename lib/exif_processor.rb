@@ -9,6 +9,28 @@ class ExifProcessor
   end
 
   # Parse xml file, then write index page, make pages and model pages
+  # Example output structure looks like this:
+  # out_dir
+  # ├── Canon
+  # │   ├── Canon_EOS_20D.html
+  # │   └── Canon_EOS_400D_DIGITAL.html
+  # ├── Canon.html
+  # ├── FUJIFILM
+  # │   └── FinePix_S6500fd.html
+  # ├── FUJIFILM.html
+  # ├── FUJI_PHOTO_FILM_CO.__LTD.
+  # │   └── SLP1000SE.html
+  # ├── FUJI_PHOTO_FILM_CO.__LTD..html
+  # ├── LEICA
+  # │   └── D-LUX_3.html
+  # ├── LEICA.html
+  # ├── NIKON_CORPORATION
+  # │   └── NIKON_D80.html
+  # ├── NIKON_CORPORATION.html
+  # ├── Panasonic
+  # │   └── DMC-FZ30.html
+  # ├── Panasonic.html
+  # └── index.html
   def process
     cameras = parse(@xml)
 
@@ -16,6 +38,9 @@ class ExifProcessor
 
     cameras.group_by {|c| c[:make]}.each do |make, cameras|
       write_make(make, cameras)
+      cameras.group_by {|c| c[:model]}.each do |model, cameras|
+        write_model(make, model, cameras)
+      end
     end
   end
 
@@ -32,16 +57,17 @@ class ExifProcessor
 
     @makes = extract_makes(cameras)
 
-    out_path = @out_dir + '/index.html'
-    File.open(out_path, 'w') do |f|
+    index_page = @out_dir + '/index.html'
+    File.open(index_page, 'w') do |f|
       template = File.open("templates/index.html.erb").read
       erb = ERB.new(template, 0, '>')
       f.write(erb.result(binding))
     end
   end
 
-  # Writes an html file for a camera make with the first 10 works of that camera
-  # and navigation to allow the usre ot brose to the index page and to each make
+  # Writes an html file for a camera make with the first 10 works of that make
+  # and navigation to allow the user to browse to the index page and to each
+  # make
   def write_make(make, cameras)
     @title = make
 
@@ -51,9 +77,35 @@ class ExifProcessor
 
     @models = extract_models(cameras)
 
-    out_path = @out_dir + '/' + sanitize_filename(make) + '.html'
-    File.open(out_path, 'w') do |f|
+    @make_dir = sanitize_filename(make)
+    make_page =  @out_dir + '/' + @make_dir + '.html'
+    File.open(make_page, 'w') do |f|
       template = File.open("templates/make.html.erb").read
+      erb = ERB.new(template, 0, '>')
+      f.write(erb.result(binding))
+    end
+  end
+
+  # Writes an html file for a camera model with the first 10 works of that model
+  # and navigation to allow the user to browse to the index page and the make
+  # Creates the model pages under a subdirectory titled by make
+  def write_model(make, model, cameras)
+    @title = make + ' - ' + model
+
+    @thumbnail_urls = cameras.map do |camera|
+      camera[:image_url]
+    end
+
+    @make = make
+    @make_location = '../' + sanitize_filename(make) + '.html'
+
+    # Create the make subdirectory if it doesn't exist already
+    make_dir = "#{@out_dir}/#{sanitize_filename(make)}"
+    Dir.mkdir(make_dir) unless File.exist?(make_dir)
+
+    model_page = "#{make_dir}/#{sanitize_filename(model)}.html"
+    File.open(model_page, 'w') do |f|
+      template = File.open("templates/model.html.erb").read
       erb = ERB.new(template, 0, '>')
       f.write(erb.result(binding))
     end
