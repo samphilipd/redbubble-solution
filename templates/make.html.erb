@@ -1,8 +1,8 @@
 <h1><%= @title %></h1>
 
 <ul>
-  <% @makes.each do |m| %>
-    <li><a href="<%= m[:filename] %>"><%= m[:make] %></a></li>
+  <% @models.each do |m| %>
+    <li><a href="<%= m[:filename] %>"><%= m[:model] %></a></li>
   <% end %>
 </ul>
 
@@ -12,3 +12,4 @@
   <% end %>
 </ul>
 
+<a href="index.html">Back to index</a>
